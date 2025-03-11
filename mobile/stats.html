@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>番茄时钟 - 统计</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: transparent;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .stats-container {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .stats-card {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .stats-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stats-group {
+            margin-bottom: 20px;
+        }
+        .stats-group-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+        .stats-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .stats-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .stats-chart {
+            width: 100%;
+            height: 200px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 12%;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+        }
+        .stats-button {
+            background-color: rgba(255, 100, 100, 0.3);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            border-radius: 50px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .stats-button:active {
+            background-color: rgba(255, 100, 100, 0.5);
+            transform: scale(0.98);
+        }
+        /* 添加装饰元素 */
+        .decoration {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            z-index: 0;
+        }
+        .decoration-1 {
+            top: 10%;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            animation: float 8s ease-in-out infinite;
+        }
+        .decoration-2 {
+            bottom: 15%;
+            left: 5%;
+            width: 40px;
+            height: 40px;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stats-container">
+        <!-- 装饰元素 -->
+        <div class="decoration decoration-1"></div>
+        <div class="decoration decoration-2"></div>
+        
+        <div class="stats-card">
+            <div class="stats-title">番茄时钟统计</div>
+            
+            <div class="stats-group">
+                <div class="stats-group-title">今日统计</div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">完成的工作周期</div>
+                    <div id="today-cycles" class="stats-value">0</div>
+                </div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">总工作时间</div>
+                    <div id="today-work-time" class="stats-value">0分钟</div>
+                </div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">总休息时间</div>
+                    <div id="today-break-time" class="stats-value">0分钟</div>
+                </div>
+            </div>
+            
+            <div class="stats-group">
+                <div class="stats-group-title">本周统计</div>
+                
+                <div class="stats-chart">
+                    <div class="chart-bar" style="left: 2%; height: 0%;">
+                        <div class="chart-label">一</div>
+                    </div>
+                    <div class="chart-bar" style="left: 16%; height: 0%;">
+                        <div class="chart-label">二</div>
+                    </div>
+                    <div class="chart-bar" style="left: 30%; height: 0%;">
+                        <div class="chart-label">三</div>
+                    </div>
+                    <div class="chart-bar" style="left: 44%; height: 0%;">
+                        <div class="chart-label">四</div>
+                    </div>
+                    <div class="chart-bar" style="left: 58%; height: 0%;">
+                        <div class="chart-label">五</div>
+                    </div>
+                    <div class="chart-bar" style="left: 72%; height: 0%;">
+                        <div class="chart-label">六</div>
+                    </div>
+                    <div class="chart-bar" style="left: 86%; height: 0%;">
+                        <div class="chart-label">日</div>
+                    </div>
+                </div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">本周完成周期</div>
+                    <div id="week-cycles" class="stats-value">0</div>
+                </div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">本周工作时间</div>
+                    <div id="week-work-time" class="stats-value">0分钟</div>
+                </div>
+            </div>
+            
+            <div class="stats-group">
+                <div class="stats-group-title">总体统计</div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">总完成周期</div>
+                    <div id="total-cycles" class="stats-value">0</div>
+                </div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">总工作时间</div>
+                    <div id="total-work-time" class="stats-value">0分钟</div>
+                </div>
+                
+                <div class="stats-item">
+                    <div class="stats-label">使用天数</div>
+                    <div id="total-days" class="stats-value">0</div>
+                </div>
+            </div>
+            
+            <div class="stats-button" onclick="resetStats()">重置统计数据</div>
+        </div>
+    </div>
+
+    <script>
+        // 统计数据结构
+        const defaultStats = {
+            today: {
+                date: new Date().toDateString(),
+                cycles: 0,
+                workTime: 0,
+                breakTime: 0
+            },
+            week: {
+                startDate: getStartOfWeek().toDateString(),
+                dailyCycles: [0, 0, 0, 0, 0, 0, 0], // 周一到周日
+                totalCycles: 0,
+                totalWorkTime: 0
+            },
+            total: {
+                cycles: 0,
+                workTime: 0,
+                days: 0,
+                firstUseDate: new Date().toDateString()
+            }
+        };
+        
+        let stats = {...defaultStats};
+        
+        // 获取本周开始日期（周一）
+        function getStartOfWeek() {
+            const now = new Date();
+            const day = now.getDay() || 7; // 将周日的0转换为7
+            const diff = day - 1; // 计算与周一的差值
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - diff);
+            monday.setHours(0, 0, 0, 0);
+            return monday;
+        }
+        
+        // 加载统计数据
+        function loadStats() {
+            const savedStats = localStorage.getItem('tomatoStats');
+            if (savedStats) {
+                try {
+                    stats = JSON.parse(savedStats);
+                    
+                    // 检查是否是新的一天
+                    if (stats.today.date !== new Date().toDateString()) {
+                        // 更新周数据
+                        updateWeekData();
+                        
+                        // 重置今日数据
+                        stats.today = {
+                            date: new Date().toDateString(),
+                            cycles: 0,
+                            workTime: 0,
+                            breakTime: 0
+                        };
+                    }
+                    
+                    // 检查是否是新的一周
+                    const currentWeekStart = getStartOfWeek().toDateString();
+                    if (stats.week.startDate !== currentWeekStart) {
+                        stats.week = {
+                            startDate: currentWeekStart,
+                            dailyCycles: [0, 0, 0, 0, 0, 0, 0],
+                            totalCycles: 0,
+                            totalWorkTime: 0
+                        };
+                    }
+                } catch (e) {
+                    console.error('加载统计数据时出错:', e);
+                    stats = {...defaultStats};
+                }
+            }
+            
+            // 更新UI
+            updateStatsUI();
+        }
+        
+        // 更新周数据
+        function updateWeekData() {
+            const now = new Date();
+            const day = now.getDay() || 7; // 将周日的0转换为7
+            const dayIndex = day - 1; // 转换为数组索引（0-6）
+            
+            // 更新当天的周数据
+            stats.week.dailyCycles[dayIndex] += stats.today.cycles;
+            stats.week.totalCycles += stats.today.cycles;
+            stats.week.totalWorkTime += stats.today.workTime;
+            
+            // 更新总体数据
+            stats.total.cycles += stats.today.cycles;
+            stats.total.workTime += stats.today.workTime;
+            
+            // 更新使用天数（如果今天有完成周期）
+            if (stats.today.cycles > 0) {
+                stats.total.days += 1;
+            }
+        }
+        
+        // 更新统计UI
+        function updateStatsUI() {
+            // 更新今日统计
+            document.getElementById('today-cycles').textContent = stats.today.cycles;
+            document.getElementById('today-work-time').textContent = formatMinutes(stats.today.workTime);
+            document.getElementById('today-break-time').textContent = formatMinutes(stats.today.breakTime);
+            
+            // 更新本周统计
+            document.getElementById('week-cycles').textContent = stats.week.totalCycles;
+            document.getElementById('week-work-time').textContent = formatMinutes(stats.week.totalWorkTime);
+            
+            // 更新总体统计
+            document.getElementById('total-cycles').textContent = stats.total.cycles;
+            document.getElementById('total-work-time').textContent = formatMinutes(stats.total.workTime);
+            document.getElementById('total-days').textContent = stats.total.days;
+            
+            // 更新图表
+            updateChart();
+        }
+        
+        // 更新图表
+        function updateChart() {
+            // 找出最大值，用于计算百分比高度
+            const maxCycles = Math.max(...stats.week.dailyCycles, 1); // 至少为1，避免除以0
+            
+            // 更新每个柱状图
+            const bars = document.querySelectorAll('.chart-bar');
+            stats.week.dailyCycles.forEach((cycles, index) => {
+                const heightPercent = (cycles / maxCycles) * 100;
+                bars[index].style.height = `${heightPercent}%`;
+            });
+        }
+        
+        // 格式化分钟显示
+        function formatMinutes(minutes) {
+            if (minutes

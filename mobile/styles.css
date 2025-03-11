@@ -1,0 +1,282 @@
+/* 全局样式 */
+:root {
+    --primary-gradient: linear-gradient(180deg, #36D1DC, #5B86E5);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --border-color: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--primary-gradient);
+    color: white;
+    min-height: 100vh;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+/* iPhone 15 Pro 样式框架 */
+.phone-frame {
+    width: 390px;
+    height: 100vh;
+    max-height: 844px;
+    background: var(--primary-gradient);
+    border-radius: 44px;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    margin: 20px auto;
+    border: 14px solid #000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 状态栏样式 */
+.status-bar {
+    height: 44px;
+    background-color: rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.status-bar-time {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 600;
+}
+
+/* 底部导航栏 */
+.tab-bar {
+    height: 83px;
+    background-color: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 16px 28px;
+    position: absolute; /* 修改为absolute定位 */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    z-index: 100;
+    box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 应用内容区域 */
+.app-content {
+    flex: 1;
+    overflow: hidden; /* 防止内容溢出 */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+#pages-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+#pages-container iframe {
+    height: calc(100vh - 44px - 83px - 28px); /* 减去状态栏和底部导航栏的高度 */
+    max-height: calc(844px - 44px - 83px - 28px); /* 适应最大高度 */
+    overflow: hidden; /* 防止iframe内容溢出 */
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    padding: 8px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    gap: 4px;
+    /* 限制点击区域在视觉边界内 */
+    box-sizing: border-box;
+    margin: 0;
+    height: 55px; /* 固定高度 */
+    overflow: hidden; /* 防止内容溢出 */
+}
+
+.tab-item:active {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: scale(0.95);
+}
+
+.tab-item i {
+    font-size: 22px;
+    margin-bottom: 2px;
+}
+
+.tab-item span {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* 调整主内容区域，避免被底部导航栏遮挡 */
+.timer-container {
+    padding-bottom: 0; /* 移除底部内边距 */
+    height: 100%; /* 确保容器占满整个高度 */
+    overflow-y: auto; /* 允许内容滚动 */
+    overflow-x: hidden; /* 防止水平滚动 */
+}
+
+/* 活跃状态样式 */
+.tab-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 圆形装饰元素 */
+.decoration-circle {
+    position: fixed;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+}
+
+.decoration-circle-1 {
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    right: -150px;
+}
+
+.decoration-circle-2 {
+    width: 200px;
+    height: 200px;
+    bottom: -100px;
+    left: -100px;
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 10px;
+    transition: all 0.3s ease;
+    /* 限制点击区域在视觉边界内 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tab-item.active {
+    color: white;
+    transform: translateY(-3px);
+}
+
+.tab-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+    /* 确保图标不会溢出 */
+    max-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 卡片通用样式 */
+.card {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+/* 按钮样式 */
+.btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    padding: 12px 24px;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.btn:active {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background-color: rgba(54, 209, 220, 0.3);
+    border: 1px solid rgba(54, 209, 220, 0.3);
+}
+
+/* 计时器特定样式 */
+.timer-display {
+    font-size: 72px;
+    font-weight: 700;
+    text-align: center;
+    margin: 20px 0;
+    line-height: 1;
+}
+
+.timer-status {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+/* 统计图表样式 */
+.stats-chart {
+    width: 100%;
+    height: 200px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.chart-bar {
+    position: absolute;
+    bottom: 0;
+    width: 12%;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 6px 6px 0 0;
+    transition: height 0.5s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* 设置页面样式 */
+.settings-container {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* 响应式调整 */
+@media (max-width: 390px) {
+    .phone-frame {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        border: none;
+        border-radius: 0;
+    }
+}

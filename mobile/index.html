@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>番茄时钟 - 移动端</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- PWA相关元标签 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#5B86E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="番茄时钟">
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+    <style>
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .control-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .control-button:active {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(0.98);
+        }
+        .extend-button {
+            background-color: rgba(100, 200, 255, 0.3);
+            border: 1px solid rgba(100, 200, 255, 0.3);
+        }
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            padding: 20px;
+        }
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .page-description {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        /* 圆形装饰元素 */
+        .circle {
+            position: fixed;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .circle-1 {
+            top: 5%;
+            left: 5%;
+            width: 150px;
+            height: 150px;
+            opacity: 0.3;
+            transform-origin: center;
+        }
+        .circle-2 {
+            top: 30%;
+            right: 2%;
+            width: 200px;
+            height: 200px;
+            opacity: 0.2;
+            transform-origin: center;
+        }
+        .circle-3 {
+            bottom: 10%;
+            left: 15%;
+            width: 180px;
+            height: 180px;
+            opacity: 0.25;
+            transform-origin: center;
+        }
+        /* 添加动画效果 */
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(10px, -15px) scale(1.05); }
+            66% { transform: translate(-5px, 10px) scale(0.95); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        .circle-1 {
+            animation: float 15s ease-in-out infinite;
+            filter: blur(30px);
+        }
+        .circle-2 {
+            animation: float 20s ease-in-out infinite reverse;
+            filter: blur(40px);
+        }
+        .circle-3 {
+            animation: float 18s ease-in-out infinite;
+            filter: blur(35px);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- iOS 状态栏 -->
+        <div class="status-bar">
+            <div class="status-bar-left">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi ml-2"></i>
+            </div>
+            <div class="status-bar-time">13:19</div>
+            <div class="status-bar-right ml-auto">
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+        
+        <!-- 应用内容区域 -->
+        <div class="app-content">
+            <!-- 装饰圆形 -->
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+            
+            <!-- 页面内容 -->
+            <div id="pages-container">
+                <!-- 页面内容将通过iframe加载 -->
+                <iframe id="timer-page" src="timer.html" frameborder="0" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>
+                <iframe id="settings-page" src="settings.html" frameborder="0" style="width:100%; height:100%; border:none; display:none; overflow:hidden;"></iframe>
+                <iframe id="stats-page" src="stats.html" frameborder="0" style="width:100%; height:100%; border:none; display:none; overflow:hidden;"></iframe>
+            </div>
+        </div>
+        
+        <!-- 底部标签栏 -->
+        <div class="tab-bar">
+            <div class="tab-item active" onclick="switchPage('timer')">
+                <div class="tab-icon"><i class="fas fa-clock"></i></div>
+                <div>计时器</div>
+            </div>
+            <div class="tab-item" onclick="switchPage('settings')">
+                <div class="tab-icon"><i class="fas fa-gear"></i></div>
+                <div>设置</div>
+            </div>
+            <div class="tab-item" onclick="switchPage('stats')">
+                <div class="tab-icon"><i class="fas fa-chart-simple"></i></div>
+                <div>统计</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchPage(pageName) {
+            // 隐藏所有页面
+            document.getElementById('timer-page').style.display = 'none';
+            document.getElementById('settings-page').style.display = 'none';
+            document.getElementById('stats-page').style.display = 'none';
+            
+            // 移除所有标签的活跃状态
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的页面
+            document.getElementById(`${pageName}-page`).style.display = 'block';
+            
+            // 设置选中标签的活跃状态
+            event.currentTarget.classList.add('active');
+        }
+        
+        // 更新状态栏时间
+        function updateStatusBarTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.querySelector('.status-bar-time').textContent = `${hours}:${minutes}`;
+        }
+        
+        // 初始化时更新一次时间
+        updateStatusBarTime();
+        
+        // 每分钟更新一次时间
+        setInterval(updateStatusBarTime, 60000);
+
+        // 注册Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
