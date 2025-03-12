@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>番茄时钟 - 设置</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: transparent;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .settings-container {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+        .settings-card {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .settings-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .settings-group {
+            margin-bottom: 20px;
+        }
+        .settings-group-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        .settings-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .settings-value {
+            display: flex;
+            align-items: center;
+        }
+        .settings-input {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            padding: 8px 12px;
+            width: 80px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .settings-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .settings-button:active {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(0.98);
+        }
+        .settings-button.primary {
+            background-color: rgba(54, 209, 220, 0.3);
+            border: 1px solid rgba(54, 209, 220, 0.3);
+        }
+        .settings-stepper {
+            display: flex;
+            align-items: center;
+        }
+        .stepper-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin: 0 8px;
+            transition: all 0.2s ease;
+        }
+        .stepper-button:active {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+        .stepper-value {
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            padding: 4px;
+        }
+        /* 添加装饰元素 */
+        .decoration {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            z-index: 0;
+        }
+        .decoration-1 {
+            top: 10%;
+            right: 10%;
+            width: 50px;
+            height: 50px;
+            animation: float 8s ease-in-out infinite;
+        }
+        .decoration-2 {
+            bottom: 15%;
+            left: 5%;
+            width: 40px;
+            height: 40px;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <!-- 装饰元素 -->
+        <div class="decoration decoration-1"></div>
+        <div class="decoration decoration-2"></div>
+        
+        <div class="settings-card">
+            <div class="settings-title">番茄时钟设置</div>
+            
+            <div class="settings-group">
+                <div class="settings-group-title">时间设置</div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">工作时间（分钟）</div>
+                    <div class="settings-stepper">
+                        <div class="stepper-button" onclick="adjustSetting('workTime', -1)"><i class="fas fa-minus"></i></div>
+                        <input type="number" id="workTime-value" class="stepper-value" value="25" min="1" max="60" onchange="updateSetting('workTime', this.value)" onclick="this.select()">
+                        <div class="stepper-button" onclick="adjustSetting('workTime', 1)"><i class="fas fa-plus"></i></div>
+                    </div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">短休息（分钟）</div>
+                    <div class="settings-stepper">
+                        <div class="stepper-button" onclick="adjustSetting('shortBreak', -1)"><i class="fas fa-minus"></i></div>
+                        <input type="number" id="shortBreak-value" class="stepper-value" value="5" min="1" max="30" onchange="updateSetting('shortBreak', this.value)" onclick="this.select()">
+                        <div class="stepper-button" onclick="adjustSetting('shortBreak', 1)"><i class="fas fa-plus"></i></div>
+                    </div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">长休息（分钟）</div>
+                    <div class="settings-stepper">
+                        <div class="stepper-button" onclick="adjustSetting('longBreak', -1)"><i class="fas fa-minus"></i></div>
+                        <input type="number" id="longBreak-value" class="stepper-value" value="15" min="1" max="60" onchange="updateSetting('longBreak', this.value)" onclick="this.select()">
+                        <div class="stepper-button" onclick="adjustSetting('longBreak', 1)"><i class="fas fa-plus"></i></div>
+                    </div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">工作周期数</div>
+                    <div class="settings-stepper">
+                        <div class="stepper-button" onclick="adjustSetting('cycles', -1)"><i class="fas fa-minus"></i></div>
+                        <input type="number" id="cycles-value" class="stepper-value" value="4" min="1" max="10" onchange="updateSetting('cycles', this.value)" onclick="this.select()">
+                        <div class="stepper-button" onclick="adjustSetting('cycles', 1)"><i class="fas fa-plus"></i></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-group">
+                <div class="settings-group-title">通知设置</div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">声音提醒</div>
+                    <div class="settings-value">
+                        <label class="switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-item">
+                    <div class="settings-label">振动提醒</div>
+                    <div class="settings-value">
+                        <label class="switch">
+                            <input type="checkbox" id="vibration-toggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-button primary" onclick="saveSettings()">
+                <i class="fas fa-save mr-2"></i> 保存设置
+            </div>
+            
+            <div class="settings-button" onclick="resetSettings()">
+                <i class="fas fa-redo mr-2"></i> 恢复默认
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 默认设置
+        const defaultSettings = {
+            workTime: 25,
+            shortBreak: 5,
+            longBreak: 15,
+            cycles: 4,
+            soundEnabled: true,
+            vibrationEnabled: true
+        };
+        
+        // 当前设置
+        let currentSettings = {
+            ...defaultSettings
+        };
+        
+        // 加载设置
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('tomatoSettings');
+            if (savedSettings) {
+                currentSettings = JSON.parse(savedSettings);
+                
+                // 更新UI
+                document.getElementById('workTime-value').value = currentSettings.workTime;
+                document.getElementById('shortBreak-value').value = currentSettings.shortBreak;
+                document.getElementById('longBreak-value').value = currentSettings.longBreak;
+                document.getElementById('cycles-value').value = currentSettings.cycles;
+                document.getElementById('sound-toggle').checked = currentSettings.soundEnabled;
+                document.getElementById('vibration-toggle').checked = currentSettings.vibrationEnabled;
+            }
+        }
+        
+        // 保存设置
+        function saveSettings() {
+            localStorage.setItem('tomatoSettings', JSON.stringify(currentSettings));
+            // 通知父页面设置已更新
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'settingsUpdated',
+                    detail: currentSettings
+                }, '*');
+            }
+            showToast('设置已保存');
+        }
+        
+        // 重置设置
+        function resetSettings() {
+            currentSettings = {...defaultSettings};
+            
+            // 更新UI
+            document.getElementById('workTime-value').value = currentSettings.workTime;
+            document.getElementById('shortBreak-value').value = currentSettings.shortBreak;
+            document.getElementById('longBreak-value').value = currentSettings.longBreak;
+            document.getElementById('cycles-value').value = currentSettings.cycles;
+            document.getElementById('sound-toggle').checked = currentSettings.soundEnabled;
+            document.getElementById('vibration-toggle').checked = currentSettings.vibrationEnabled;
+            
+            localStorage.setItem('tomatoSettings', JSON.stringify(currentSettings));
+            showToast('已恢复默认设置');
+        }
+        
+        // 调整设置值
+        function adjustSetting(setting, change) {
+            const input = document.getElementById(`${setting}-value`);
+            let value = parseInt(input.value) + change;
+            updateSetting(setting, value);
+        }
+
+        // 更新设置值
+        function updateSetting(setting, newValue) {
+            newValue = parseInt(newValue);
+            const input = document.getElementById(`${setting}-value`);
+            
+            // 设置最小值和最大值
+            switch(setting) {
+                case 'workTime':
+                    newValue = Math.max(1, Math.min(60, newValue));
+                    break;
+                case 'shortBreak':
+                    newValue = Math.max(1, Math.min(30, newValue));
+                    break;
+                case 'longBreak':
+                    newValue = Math.max(1, Math.min(60, newValue));
+                    break;
+                case 'cycles':
+                    newValue = Math.max(1, Math.min(10, newValue));
+                    break;
+            }
+            
+            input.value = newValue;
+            currentSettings[setting] = newValue;
+            
+            // 立即保存设置并通知其他页面
+            localStorage.setItem('tomatoSettings', JSON.stringify(currentSettings));
+            const event = new CustomEvent('settingsUpdated', { detail: currentSettings });
+            window.dispatchEvent(event);
+        }
+        
+        // 显示提示消息
+        function showToast(message) {
+            // 创建提示元素
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // 显示提示
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            // 隐藏提示
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+        
+        // 切换开关状态
+        document.getElementById('sound-toggle').addEventListener('change', function() {
+            currentSettings.soundEnabled = this.checked;
+        });
+        
+        document.getElementById('vibration-toggle').addEventListener('change', function() {
+            currentSettings.vibrationEnabled = this.checked;
+        });
+        
+        // 初始化加载设置
+        loadSettings();
+    </script>
+</body>
+</html>
