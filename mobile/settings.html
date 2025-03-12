@@ -168,7 +168,7 @@
                     <div class="settings-label">工作时间（分钟）</div>
                     <div class="settings-stepper">
                         <div class="stepper-button" onclick="adjustSetting('workTime', -1)"><i class="fas fa-minus"></i></div>
-                        <div id="workTime-value" class="stepper-value">25</div>
+                        <input type="number" id="workTime-value" class="stepper-value" value="25" min="1" max="60" onchange="updateSetting('workTime', this.value)" onclick="this.select()">
                         <div class="stepper-button" onclick="adjustSetting('workTime', 1)"><i class="fas fa-plus"></i></div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@
                     <div class="settings-label">短休息（分钟）</div>
                     <div class="settings-stepper">
                         <div class="stepper-button" onclick="adjustSetting('shortBreak', -1)"><i class="fas fa-minus"></i></div>
-                        <div id="shortBreak-value" class="stepper-value">5</div>
+                        <input type="number" id="shortBreak-value" class="stepper-value" value="5" min="1" max="30" onchange="updateSetting('shortBreak', this.value)" onclick="this.select()">
                         <div class="stepper-button" onclick="adjustSetting('shortBreak', 1)"><i class="fas fa-plus"></i></div>
                     </div>
                 </div>
@@ -186,7 +186,7 @@
                     <div class="settings-label">长休息（分钟）</div>
                     <div class="settings-stepper">
                         <div class="stepper-button" onclick="adjustSetting('longBreak', -1)"><i class="fas fa-minus"></i></div>
-                        <div id="longBreak-value" class="stepper-value">15</div>
+                        <input type="number" id="longBreak-value" class="stepper-value" value="15" min="1" max="60" onchange="updateSetting('longBreak', this.value)" onclick="this.select()">
                         <div class="stepper-button" onclick="adjustSetting('longBreak', 1)"><i class="fas fa-plus"></i></div>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
                     <div class="settings-label">工作周期数</div>
                     <div class="settings-stepper">
                         <div class="stepper-button" onclick="adjustSetting('cycles', -1)"><i class="fas fa-minus"></i></div>
-                        <div id="cycles-value" class="stepper-value">4</div>
+                        <input type="number" id="cycles-value" class="stepper-value" value="4" min="1" max="10" onchange="updateSetting('cycles', this.value)" onclick="this.select()">
                         <div class="stepper-button" onclick="adjustSetting('cycles', 1)"><i class="fas fa-plus"></i></div>
                     </div>
                 </div>
@@ -258,10 +258,10 @@
                 currentSettings = JSON.parse(savedSettings);
                 
                 // 更新UI
-                document.getElementById('workTime-value').textContent = currentSettings.workTime;
-                document.getElementById('shortBreak-value').textContent = currentSettings.shortBreak;
-                document.getElementById('longBreak-value').textContent = currentSettings.longBreak;
-                document.getElementById('cycles-value').textContent = currentSettings.cycles;
+                document.getElementById('workTime-value').value = currentSettings.workTime;
+                document.getElementById('shortBreak-value').value = currentSettings.shortBreak;
+                document.getElementById('longBreak-value').value = currentSettings.longBreak;
+                document.getElementById('cycles-value').value = currentSettings.cycles;
                 document.getElementById('sound-toggle').checked = currentSettings.soundEnabled;
                 document.getElementById('vibration-toggle').checked = currentSettings.vibrationEnabled;
             }
@@ -270,6 +270,13 @@
         // 保存设置
         function saveSettings() {
             localStorage.setItem('tomatoSettings', JSON.stringify(currentSettings));
+            // 通知父页面设置已更新
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'settingsUpdated',
+                    detail: currentSettings
+                }, '*');
+            }
             showToast('设置已保存');
         }
         
@@ -278,38 +285,52 @@
             currentSettings = {...defaultSettings};
             
             // 更新UI
-            document.getElementById('workTime-value').textContent = currentSettings.workTime;
-            document.getElementById('shortBreak-value').textContent = currentSettings.shortBreak;
-            document.getElementById('longBreak-value').textContent = currentSettings.longBreak;
-            document.getElementById('cycles-value').textContent = currentSettings.cycles;
+            document.getElementById('workTime-value').value = currentSettings.workTime;
+            document.getElementById('shortBreak-value').value = currentSettings.shortBreak;
+            document.getElementById('longBreak-value').value = currentSettings.longBreak;
+            document.getElementById('cycles-value').value = currentSettings.cycles;
             document.getElementById('sound-toggle').checked = currentSettings.soundEnabled;
             document.getElementById('vibration-toggle').checked = currentSettings.vibrationEnabled;
             
+            localStorage.setItem('tomatoSettings', JSON.stringify(currentSettings));
             showToast('已恢复默认设置');
         }
         
         // 调整设置值
         function adjustSetting(setting, change) {
-            let value = currentSettings[setting] + change;
+            const input = document.getElementById(`${setting}-value`);
+            let value = parseInt(input.value) + change;
+            updateSetting(setting, value);
+        }
+
+        // 更新设置值
+        function updateSetting(setting, newValue) {
+            newValue = parseInt(newValue);
+            const input = document.getElementById(`${setting}-value`);
             
             // 设置最小值和最大值
             switch(setting) {
                 case 'workTime':
-                    value = Math.max(1, Math.min(60, value));
+                    newValue = Math.max(1, Math.min(60, newValue));
                     break;
                 case 'shortBreak':
-                    value = Math.max(1, Math.min(30, value));
+                    newValue = Math.max(1, Math.min(30, newValue));
                     break;
                 case 'longBreak':
-                    value = Math.max(1, Math.min(60, value));
+                    newValue = Math.max(1, Math.min(60, newValue));
                     break;
                 case 'cycles':
-                    value = Math.max(1, Math.min(10, value));
+                    newValue = Math.max(1, Math.min(10, newValue));
                     break;
             }
             
-            currentSettings[setting] = value;
-            document.getElementById(`${setting}-value`).textContent = value;
+            input.value = newValue;
+            currentSettings[setting] = newValue;
+            
+            // 立即保存设置并通知其他页面
+            localStorage.setItem('tomatoSettings', JSON.stringify(currentSettings));
+            const event = new CustomEvent('settingsUpdated', { detail: currentSettings });
+            window.dispatchEvent(event);
         }
         
         // 显示提示消息

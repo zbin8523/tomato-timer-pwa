@@ -198,12 +198,23 @@
 
     <script>
         // 番茄时钟设置
-        const settings = {
+        let settings = {
             workTime: 25,
             shortBreak: 5,
             longBreak: 15,
             cycles: 4
         };
+        
+        // 加载设置
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('tomatoSettings');
+            if (savedSettings) {
+                settings = JSON.parse(savedSettings);
+                timeLeft = settings.workTime * 60;
+                updateTimerDisplay();
+                updateStatusDisplay();
+            }
+        }
         
         let timerInterval;
         let timeLeft = settings.workTime * 60;
@@ -317,7 +328,80 @@
             console.log('时间到！');
         }
         
+        // 监听设置更新事件
+        window.addEventListener('settingsUpdated', function(event) {
+            const oldSettings = {...settings};
+            settings = event.detail;
+            
+            // 更新周期显示
+            if (oldSettings.cycles !== settings.cycles) {
+                currentCycle = Math.min(currentCycle, settings.cycles);
+            }
+            
+            // 根据当前状态更新剩余时间
+            const currentTotal = isWorkTime ? 
+                settings.workTime * 60 : 
+                (currentCycle % settings.cycles === 0 ? settings.longBreak * 60 : settings.shortBreak * 60);
+            
+            // 如果正在运行，保持当前进度比例
+            if (isRunning) {
+                const oldTotal = isWorkTime ? 
+                    oldSettings.workTime * 60 : 
+                    (currentCycle % oldSettings.cycles === 0 ? oldSettings.longBreak * 60 : oldSettings.shortBreak * 60);
+                const progress = timeLeft / oldTotal;
+                timeLeft = Math.round(currentTotal * progress);
+            } else {
+                timeLeft = currentTotal;
+            }
+            
+            updateTimerDisplay();
+            updateStatusDisplay();
+        });
+
+        // 监听来自父页面的消息
+        window.addEventListener('message', function(event) {
+            console.log('计时器页面收到消息:', event.data);
+            // 检查消息类型是否为设置更新
+            if (event.data && event.data.type === 'settingsUpdated') {
+                console.log('收到设置更新:', event.data.detail);
+                const oldSettings = {...settings};
+                settings = event.data.detail;
+                
+                // 更新周期显示
+                if (oldSettings.cycles !== settings.cycles) {
+                    currentCycle = Math.min(currentCycle, settings.cycles);
+                }
+                
+                // 根据当前状态更新剩余时间
+                const currentTotal = isWorkTime ? 
+                    settings.workTime * 60 : 
+                    (currentCycle % settings.cycles === 0 ? settings.longBreak * 60 : settings.shortBreak * 60);
+                
+                // 如果正在运行，保持当前进度比例
+                if (isRunning) {
+                    const oldTotal = isWorkTime ? 
+                        oldSettings.workTime * 60 : 
+                        (currentCycle % oldSettings.cycles === 0 ? oldSettings.longBreak * 60 : oldSettings.shortBreak * 60);
+                    const progress = timeLeft / oldTotal;
+                    timeLeft = Math.round(currentTotal * progress);
+                } else {
+                    timeLeft = currentTotal;
+                }
+                
+                updateTimerDisplay();
+                updateStatusDisplay();
+                console.log('计时器已更新 - 当前时间:', timeLeft, '秒');
+            }
+        });
+        
+        // 通知父页面计时器已准备好接收设置
+        if (window.parent) {
+            window.parent.postMessage({ type: 'timerReady' }, '*');
+            console.log('计时器页面已通知父页面准备就绪');
+        }
+
         // 初始化
+        loadSettings();
         updateStatusDisplay();
         updateTimerDisplay();
     </script>

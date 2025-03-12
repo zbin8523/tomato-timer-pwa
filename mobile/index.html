@@ -171,6 +171,18 @@
             
             // 设置选中标签的活跃状态
             event.currentTarget.classList.add('active');
+
+            // 如果从设置页面切换到计时器页面，通知计时器页面更新设置
+            if (pageName === 'timer') {
+                const timerFrame = document.getElementById('timer-page');
+                const settings = localStorage.getItem('tomatoSettings');
+                if (settings) {
+                    timerFrame.contentWindow.postMessage({
+                        type: 'settingsUpdated',
+                        detail: JSON.parse(settings)
+                    }, '*');
+                }
+            }
         }
         
         // 更新状态栏时间
@@ -186,6 +198,43 @@
         
         // 每分钟更新一次时间
         setInterval(updateStatusBarTime, 60000);
+        
+        // 页面加载完成后，向计时器页面发送设置
+        window.addEventListener('load', function() {
+            const timerFrame = document.getElementById('timer-page');
+            const settings = localStorage.getItem('tomatoSettings');
+            if (settings && timerFrame.contentWindow) {
+                // 确保iframe已加载完成
+                timerFrame.onload = function() {
+                    timerFrame.contentWindow.postMessage({
+                        type: 'settingsUpdated',
+                        detail: JSON.parse(settings)
+                    }, '*');
+                };
+                
+                // 如果iframe已经加载完成，直接发送消息
+                if (timerFrame.contentDocument && timerFrame.contentDocument.readyState === 'complete') {
+                    timerFrame.contentWindow.postMessage({
+                        type: 'settingsUpdated',
+                        detail: JSON.parse(settings)
+                    }, '*');
+                }
+            }
+        });
+
+        // 监听来自settings页面的消息
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'settingsUpdated') {
+                // 将消息转发给timer页面
+                const timerFrame = document.getElementById('timer-page');
+                if (timerFrame && timerFrame.contentWindow) {
+                    timerFrame.contentWindow.postMessage({
+                        type: 'settingsUpdated',
+                        detail: event.data.detail
+                    }, '*');
+                }
+            }
+        });
 
         // 注册Service Worker
         if ('serviceWorker' in navigator) {

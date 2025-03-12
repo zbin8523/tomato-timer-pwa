@@ -1,77 +1,62 @@
 # 番茄时钟 PWA 转 Android 应用指南
 
-本文档将指导您如何将番茄时钟 PWA (渐进式 Web 应用) 转换为可安装的 Android 应用。
+本文档将指导您如何使用 PWA Builder 在线服务将番茄时钟 PWA (渐进式 Web 应用) 转换为可安装的 Android 应用。
 
-## 准备工作
+## 使用 PWA Builder 打包 Android 应用
 
-我们已经完成了以下准备工作：
+### 准备工作
 
-1. 创建了完整的 PWA 应用，包括：
-   - 完整的 manifest.json 配置
-   - 注册并配置了 service-worker.js
-   - 创建了各种尺寸的应用图标
-   - 确保应用可以离线工作
+确保您已经获取了项目根目录中的 `pwa.zip` 文件，该文件包含了完整的 PWA 应用代码和资源，包括：
+- manifest.json 配置文件
+- service-worker.js 服务工作线程
+- 应用图标和其他资源文件
+- HTML、CSS 和 JavaScript 文件
 
-2. 测试了 PWA 功能，确保在浏览器中可以正常工作
+### 详细步骤
 
-## 将 PWA 转换为 Android 应用的方法
+1. 访问 PWA Builder 网站
+   - 打开浏览器，访问 [PWA Builder](https://www.pwabuilder.com/)
+   - 在首页点击 "Start" 按钮
 
-### 方法一：使用 PWA Builder（推荐，最简单）
+2. 上传 PWA 文件
+   - 在 PWA Builder 页面上，选择 "Package your PWA" 选项
+   - 点击 "Upload a .zip file" 按钮
+   - 选择并上传项目根目录中的 `pwa.zip` 文件
+   - 等待文件上传完成和分析过程
 
-1. 访问 [PWA Builder 网站](https://www.pwabuilder.com/)
-2. 在首页输入您的 PWA 网址（如果您已将此 PWA 部署到网络上）
-3. 点击"开始"按钮，PWA Builder 将分析您的 PWA
-4. 分析完成后，点击"生成包"按钮
-5. 选择"Android"选项
-6. 下载生成的APK文件
-7. 将APK文件安装到您的Android设备上
+3. 选择 Android 平台
+   - 在平台选择页面，找到 "Android" 选项
+   - 点击 "Build" 按钮开始构建过程
+   - 根据提示配置应用信息（如有需要）：
+     * 应用名称
+     * 包名
+     * 版本号
+     * 图标（已包含在zip文件中）
 
-### 方法二：使用第三方在线转换服务
+4. 下载 APK 文件
+   - 构建完成后，系统会自动生成 APK 文件
+   - 点击 "Download" 按钮下载生成的 APK 文件
+   - 将文件保存到您的计算机上
 
-#### 1. GoNative.io
+5. 安装到 Android 设备
+   - 将 APK 文件传输到 Android 设备
+   - 在设备上找到并点击 APK 文件
+   - 按照提示完成安装过程
+   - 注意：可能需要在设备设置中允许「安装未知来源应用」
 
-1. 访问 [GoNative 网站](https://gonative.io/)
-2. 输入您的PWA网址
-3. 填写应用基本信息（名称、图标等）
-4. 选择需要的功能（如推送通知、地理位置等）
-5. 点击"构建我的应用"按钮
-6. 下载生成的APK文件并安装到设备上
+### 注意事项
 
-#### 2. AppMaker
+1. 确保 `pwa.zip` 文件包含了所有必要的文件和资源
+2. 上传文件大小可能有限制，请确保文件大小适中
+3. 生成的 APK 文件可能需要签名才能在 Google Play 商店发布
+4. 如果遇到问题，可以查看 PWA Builder 的帮助文档或联系支持团队
 
-1. 访问 [AppMaker 网站](https://appmaker.xyz/)
-2. 注册并登录账号
-3. 创建新项目，选择"Web应用转换"
-4. 输入您的PWA网址
-5. 自定义应用外观和功能
-6. 生成并下载APK文件
+### 优势
 
-### 方法三：使用Capacitor或Cordova框架
+- 无需编程知识
+- 操作简单直观
+- 快速获得可安装的 Android 应用
+- 保留 PWA 的所有功能
+- 可以离线使用
 
-如果您有一定的开发经验，可以考虑使用以下框架：
-
-#### 1. Capacitor
-
-1. 安装Capacitor：`npm install @capacitor/core @capacitor/android`
-2. 初始化项目：`npx cap init [应用名称] [应用ID]`
-3. 添加Android平台：`npx cap add android`
-4. 复制您的PWA文件到www文件夹
-5. 同步项目：`npx cap sync`
-6. 使用Android Studio打开生成的Android项目：`npx cap open android`
-7. 在Android Studio中构建APK
-
-#### 2. Cordova
-
-1. 安装Cordova：`npm install -g cordova`
-2. 创建项目：`cordova create [项目文件夹] [应用ID] [应用名称]`
-3. 添加Android平台：`cordova platform add android`
-4. 将您的PWA文件复制到www文件夹
-5. 构建应用：`cordova build android`
-6. 在`platforms/android/app/build/outputs/apk/debug`目录找到生成的APK文件
-
-### 方法四：使用Bubblewrap (TWA)
-
-1. 安装Bubblewrap CLI：`npm install -g @bubblewrap/cli`
-2. 初始化项目：`bubblewrap init --manifest=[您的PWA网址]/manifest.json`
-3. 构建APK：`bubblewrap build`
-4. 在生成的目录中找到APK文件并安装
+如果您在转换过程中遇到任何问题，请参考 [PWA Builder 文档](https://docs.pwabuilder.com/) 或在项目 Issues 中提出问题。
